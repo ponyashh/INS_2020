@@ -6,26 +6,27 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 
 #1
-dataframe = pandas.read_csv('./iris.data', header=None)
+dataframe = pandas.read_csv("sonar.all-data", header=None)
 dataset = dataframe.values
-X = dataset[:,0:4].astype(float)
-Y = dataset[:,4]
+X = dataset[:,0:60].astype(float)
+Y = dataset[:,60]
 
 #2
 encoder = LabelEncoder()
 encoder.fit(Y)
 encoded_Y = encoder.transform(Y)
-dummy_y = to_categorical(encoded_Y)
 
 #3
 model = Sequential()
-model.add(Dense(16, activation='relu'))
-model.add(Dense(3, activation='softmax'))
+model.add(Dense(30, input_dim=60, kernel_initializer='normal', activation='relu'))
+model.add(Dense(15, kernel_initializer='normal', activation='relu'))
+model.add(Dense(1, kernel_initializer='normal', activation='sigmoid')) 
+
 #4
-model.compile(optimizer='adam',loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam',loss='binary_crossentropy', metrics=['accuracy'])
 
 #5
-h = model.fit(X, dummy_y, epochs=500, verbose=0, batch_size=10, validation_split=0.1)
+h = model.fit(X, encoded_Y, epochs=100, verbose=0, batch_size=10, validation_split=0.1)
 history = h.history
 
 # Получение ошибки и точности в процессе обучения
@@ -45,7 +46,8 @@ plt.legend()
 plt.show()
 
 # Построение графика точности
-#plt.clf()
+
+plt.clf()
 plt.plot(epochs, acc, 'r', label='Training acc')
 plt.plot(epochs, val_acc, 'b', label='Validation acc')
 plt.title('Training and validation accuracy')
